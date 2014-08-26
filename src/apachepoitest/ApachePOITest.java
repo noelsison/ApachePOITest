@@ -10,6 +10,8 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.apache.poi.xwpf.usermodel.XWPFDocument;
@@ -31,7 +33,8 @@ public class ApachePOITest {
                 System.out.println("#" + counter++ + ": " + r.toString());
             }
             else {
-                System.out.println("#" + counter++ + ": <SPACE>");
+                //System.out.println("#" + counter++ + ": <SPACE>");
+                break;
             }
             if (r.getColor() != null) {
                 System.out.println("COLOR: " + r.getColor());
@@ -99,7 +102,7 @@ public class ApachePOITest {
                 */
             }   // can also use .searchText to look for a string
             else {
-                System.out.println("\n#" + i1++ + " LINE: <SPACE>");
+                //System.out.println("\n#" + i1++ + " LINE: <SPACE>");
             }
                 
             showParagraphElementProperties(p.getRuns());
@@ -124,11 +127,65 @@ public class ApachePOITest {
     /**
      * @param args the command line arguments
      */
+    public static Boolean checkElementProperty(List<XWPFRun> rl, String key, Object value)
+    {
+        Boolean exists = false;
+        Object o = false;
+        for (XWPFRun r : rl) {
+            System.out.println("                RUN: " + r.toString());
+            switch (key) {
+                case "COLOR":
+                    o = r.getColor();
+                    break;
+                case "FONT FAMILY":
+                    o = r.getFontFamily();
+                    break;
+                case "FONT SIZE":
+                    o = r.getFontSize();
+                    break;
+                case "BOLD":
+                    o = r.isBold();
+                    break;
+                default:
+                    return false;
+            }
+            if (o != null) {
+                break;
+            }
+        }
+        //System.out.println(o);
+        return o.equals(value);
+    }
     public static void main(String[] args) {
         
         try {
-            XWPFDocument docx1 = new XWPFDocument(new FileInputStream(new File("C:\\Users\\Noel\\Documents\\NetBeansProjects\\ApachePOITest\\test.docx")));
-            showProperties(docx1);
+            XWPFDocument docx1 = new XWPFDocument(new FileInputStream(new File("C:\\Users\\Noel\\Documents\\NetBeansProjects\\ApachePOITest\\resume_only.docx")));
+            //showProperties(docx1);
+            
+            List<XWPFParagraph> lp = docx1.getParagraphs();
+            Boolean temp_bool;
+            temp_bool = true;
+            
+            String q1_strings[] = {"Melissa Martin", "555 West Main St.", "Sampaloc, Metro Manila", "Phone: 312-312-3123", "E-mail: TeachMartin@email.com"};
+            //FONT MV Boli
+            //SIZE 12
+            Map to_check = new HashMap();
+            to_check.put("FONT FAMILY", "MV Boli");
+            to_check.put("FONT SIZE", (int) 12);
+            
+            for (XWPFParagraph p: lp) {
+                for (String s: q1_strings) {
+                    if (p.getParagraphText().trim().equals(s)) {
+                        System.out.println("DETECTED: " + p.getParagraphText());
+                        System.out.println("RUNS: " + p.getRuns().size());
+                        for (Object key: to_check.keySet()) {
+                            System.out.println("    PROPERTY: " + key);
+                            temp_bool = checkElementProperty(p.getRuns(), key.toString(), to_check.get(key));
+                            System.out.println("    EXISTS: " + temp_bool);
+                        }
+                    }
+                }
+            }
         } catch (IOException ex) {
             Logger.getLogger(ApachePOITest.class.getName()).log(Level.SEVERE, null, ex);
         }
