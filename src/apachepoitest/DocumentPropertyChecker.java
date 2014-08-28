@@ -178,14 +178,14 @@ public class DocumentPropertyChecker {
         //Initialize counts to 0
 
         for (String property : properties.keySet()) {
-            results.get(s).put( property, "WRONG");
+            results.get(s).put( property, "0/1");
         }
 
         //For each existing string, 
         for (String property : properties.keySet()) {
             if (checkIfParagraphHasProperty(p, property, properties.get(property)))
             {
-                results.get(s).put( property, "CORRECT");
+                results.get(s).put( property, "1/1");
             }
         }
         
@@ -222,6 +222,34 @@ public class DocumentPropertyChecker {
             if (tempMap != null) {
                 sl.remove(removeString);
             }
+        }
+        return results;
+    }
+    //Check all paragraphs
+    public static Map<String, Object> checkPropertiesOfAllParagraphs(List<XWPFParagraph> pl, Map<String, String> properties) {
+        Map<String, Object> results = new HashMap<>(), 
+                             tempMap = new HashMap<>();
+        ArrayList tempList;
+        String removeString = "";
+        
+        int paragraph_count = 0;
+        
+        // Initialize results, strings which were not found in the document are left as 0
+        for (String property : properties.keySet()) {
+            results.put(property, 0);
+        }
+        
+        for (XWPFParagraph p : pl) {
+            if (p.getParagraphText().isEmpty()) { continue; }
+            paragraph_count++;
+            for (String property : properties.keySet()) {
+                if(checkIfParagraphHasProperty(p, property, properties.get(property))) {
+                    results.put( property, (int) results.get(property) + 1);
+                }
+            }
+        }
+        for (String property : properties.keySet()) {
+            results.put( property, results.get(property) + "/" + paragraph_count);
         }
         return results;
     }

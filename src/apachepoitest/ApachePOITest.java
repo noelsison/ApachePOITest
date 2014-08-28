@@ -102,14 +102,16 @@ public class ApachePOITest {
             results = DocumentPropertyChecker.checkPropertiesOfParagraphs(docx1.getParagraphs(), sl, properties);
             System.out.println(results.toString());
             
+            //7
+            //CTPageMar margin = docx.getDocument().getBody().getSectPr().getPgMar();
+            
             //8
-            sl = new ArrayList();
             properties = new HashMap();
             properties.put("ALIGN", "both");
             
-            results = DocumentPropertyChecker.checkPropertiesOfParagraphs(docx1.getParagraphs(), sl, properties);
+            results = DocumentPropertyChecker.checkPropertiesOfAllParagraphs(docx1.getParagraphs(), properties);
             System.out.println(results.toString());
-                    
+            
         } catch (IOException ex) {
             Logger.getLogger(ApachePOITest.class.getName()).log(Level.SEVERE, null, ex);
         }
