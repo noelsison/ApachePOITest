@@ -42,11 +42,11 @@ public class DocumentPropertyChecker {
                 case "FONT SIZE":
                     return r.getFontSize() == Integer.parseInt(value);
                 case "BOLD":
-                    return r.isBold() == Boolean.getBoolean(value);
+                    return r.isBold() == Boolean.valueOf(value);
                 case "ITALIC":
-                    return r.isItalic() == Boolean.getBoolean(value);
+                    return r.isItalic() == Boolean.valueOf(value);
                 case "STRIKETHROUGH":
-                    return r.isStrike() == Boolean.getBoolean(value);
+                    return r.isStrike() == Boolean.valueOf(value);
                 default:
                     System.out.println("Property " + property +  " does not exist!");
                     return false;
@@ -73,6 +73,10 @@ public class DocumentPropertyChecker {
         }
         //For each existing string, 
         for (XWPFRun r : rl) {
+            //Skip run if empty string
+            if (r.toString().isEmpty()) {
+                continue;
+            }
             for (String s : sl) {
                 //Skip string if it does't exist
                 if (results.get(s).get("EXISTS").equals(true)) {
@@ -86,10 +90,17 @@ public class DocumentPropertyChecker {
                 }
             }
         }
+        //Count only runs which are not empty for scoring
+        int total_runs = 0;
+        for (XWPFRun r : rl) {
+            if (!r.toString().isEmpty()) {
+                total_runs++;
+            }
+        }
         //Transform results to score
         for (String s : sl) {
             for (String property : properties.keySet()) {
-                results.get(s).put( property, Integer.toString((int) results.get(s).get(property)) + "/" + Integer.toString(rl.size()));
+                results.get(s).put( property, Integer.toString((int) results.get(s).get(property)) + "/" + total_runs);
             }
         }
         return results;
@@ -117,6 +128,91 @@ public class DocumentPropertyChecker {
                     tempList = new ArrayList();
                     tempList.add(s);
                     tempMap = checkPropertiesofParagraphRuns(p, tempList, properties);
+                    results.put(s, tempMap.get(s));
+                    removeString = s;
+                    break;
+                }
+            }
+            //Remove string if it has been evaluated
+            if (tempMap != null) {
+                sl.remove(removeString);
+            }
+        }
+        return results;
+    }
+    public static Boolean checkIfParagraphHasProperty(XWPFParagraph p, String property, String value) {
+        try {
+            switch (property) {
+                case "LINE SPACING":
+                    XWPFParagraphClone pc;
+                    pc = new XWPFParagraphClone(p.getCTP(), p.getBody());
+                    return pc.getCTSpacing(false).getLine().floatValue()/240 == Float.parseFloat(value);
+                case "NUMBERING FORMAT":
+                    return p.getNumFmt().equalsIgnoreCase(value);
+                case "ALIGN":
+                    return p.getAlignment().toString().equalsIgnoreCase(value);
+                default:
+                    System.out.println("Property " + property +  " does not exist!");
+                    return false;
+            }
+        }
+        catch (NullPointerException e) {
+            return false;
+        }
+    }
+    //single paragraph
+    public static Map<String, HashMap> checkPropertiesofParagraph(XWPFParagraph p, String s, Map<String, String> properties) {
+        List<XWPFRun> rl = p.getRuns();
+        Map<String, HashMap> results = new HashMap();
+        results.put(s, new HashMap());
+        //Check first if elements in sl are in p
+        if(p.getParagraphText().contains(s)){
+            results.get(s).put("EXISTS", true);
+        }
+        else
+        {
+            results.get(s).put("EXISTS", false);
+            return results;
+        }
+        
+        //Initialize counts to 0
+
+        for (String property : properties.keySet()) {
+            results.get(s).put( property, "WRONG");
+        }
+
+        //For each existing string, 
+        for (String property : properties.keySet()) {
+            if (checkIfParagraphHasProperty(p, property, properties.get(property)))
+            {
+                results.get(s).put( property, "CORRECT");
+            }
+        }
+        
+        return results;
+    }
+    
+    //Paragraph properties, ignore runs
+    public static Map<String, HashMap> checkPropertiesOfParagraphs(List<XWPFParagraph> pl, ArrayList<String> sl, Map<String, String> properties) {
+        Map<String, HashMap> results = new HashMap<>(), 
+                             tempMap = new HashMap<>();
+        ArrayList tempList;
+        String removeString = "";
+        
+        // Initialize results, strings which were not found in the document are left as EXISTS : false
+        for (String s : sl) {
+            results.put(s, new HashMap<>());
+            results.get(s).put("EXISTS", false);
+        }
+        
+        for (XWPFParagraph p : pl) {
+            for (String s : sl) {
+                tempMap = null;
+                //Will fail on typos, but pass on extra elements before or after string of interest
+                //Need to change for typo toleration and exactness?
+                if (p.getParagraphText().contains(s))
+                {   
+                    tempMap = checkPropertiesofParagraph(p, s, properties);
                     results.put(s, tempMap.get(s));
                     removeString = s;
                     break;

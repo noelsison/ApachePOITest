@@ -7,6 +7,8 @@
 package apachepoitest;
 
 import java.util.List;
+import org.apache.poi.xslf.usermodel.XSLFTextParagraph;
+import org.apache.poi.xwpf.usermodel.LineSpacingRule;
 import org.apache.poi.xwpf.usermodel.XWPFDocument;
 import org.apache.poi.xwpf.usermodel.XWPFParagraph;
 import org.apache.poi.xwpf.usermodel.XWPFRun;
@@ -101,6 +103,51 @@ public class DocumentPropertyEnumerator {
             }
                 
             showParagraphElementProperties(p.getRuns());
+        }
+    }
+    public static void showParagraphPropertiesOnly(List<XWPFParagraph> lp)
+    {
+        int i1 = 1;
+        for (XWPFParagraph p : lp) {
+            //System.out.println(p.getStyleID() + " " + sl1.getStyle(p.getStyleID()).getCTStyle().xmlText());
+            System.out.println("____________________________________");
+            if(p.getParagraphText().trim().length() > 0) {
+                System.out.println("\n#" + i1++ + " LINE: " + p.getParagraphText());
+                System.out.println("ALIGNMENT: " + p.getAlignment().toString());
+                //Uncomment to display other properties
+                
+                System.out.println("BORDER BETWEEN: " + p.getBorderBetween().toString());
+                System.out.println("BORDER BOTTOM: " + p.getBorderBottom().toString());
+                System.out.println("BORDER LEFT: " + p.getBorderLeft().toString());
+                System.out.println("BORDER RIGHT: " + p.getBorderRight().toString());
+                System.out.println("BORDER TOP: " + p.getBorderTop().toString());
+                System.out.println("BODY ELEMENT TYPE: " + p.getElementType().toString());
+                System.out.println("FOOTNOTE: " + p.getFootnoteText());
+                System.out.println("INDENTATION 1ST LINE: " + p.getIndentationFirstLine());
+                System.out.println("INDENTATION HANGING: " + p.getIndentationHanging());
+                System.out.println("INDENTATION LEFT: " + p.getIndentationLeft());
+                System.out.println("INDENTATION RIGHT: " + p.getIndentationRight());
+                System.out.println("NUMBERING FORMAT: " + p.getNumFmt());
+                System.out.println("NUMERIC STYLE ILVL: " + p.getNumIlvl());
+                System.out.println("STYLE: " + p.getBody().getXWPFDocument().getStyles().getStyle(p.getStyleID()));
+                
+                XWPFParagraphClone pc;
+                pc = new XWPFParagraphClone(p.getCTP(), p.getBody());
+                
+                
+                System.out.println("SPACING VALUE: " + pc.getCTSpacing(false).getLine().floatValue()/240);
+                System.out.println("SPACING AFTER: " + p.getSpacingAfter());
+                System.out.println("SPACING AFTER LINES: " + p.getSpacingAfterLines());
+                System.out.println("SPACING BEFORE: " + p.getSpacingBefore());
+                System.out.println("SPACING BEFORE LINES: " + p.getSpacingBeforeLines());
+                System.out.println("SPACING LINE RULE: " + p.getSpacingLineRule());
+                System.out.println("VERTICAL ALIGNMENT: " + p.getVerticalAlignment());
+                
+            }   // can also use .searchText to look for a string
+            else {
+                // Uncomment to display lines
+                //System.out.println("\n#" + i1++ + " LINE: <SPACE>");
+            }
         }
     }
     public static void showTableProperties(List<XWPFTable> lt)
