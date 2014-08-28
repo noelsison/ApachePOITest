@@ -6,12 +6,15 @@
 
 package apachepoitest;
 
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import org.apache.poi.xwpf.usermodel.XWPFDocument;
 import org.apache.poi.xwpf.usermodel.XWPFParagraph;
 import org.apache.poi.xwpf.usermodel.XWPFRun;
+import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTPageMar;
 
 /**
  * Make this class read from XML files that contain the formatted "question"
@@ -234,7 +237,7 @@ public class DocumentPropertyChecker {
         
         int paragraph_count = 0;
         
-        // Initialize results, strings which were not found in the document are left as 0
+        // Initialize results, properties which were not found in the document are left as 0
         for (String property : properties.keySet()) {
             results.put(property, 0);
         }
@@ -250,6 +253,37 @@ public class DocumentPropertyChecker {
         }
         for (String property : properties.keySet()) {
             results.put( property, results.get(property) + "/" + paragraph_count);
+        }
+        return results;
+    }
+    public static boolean checkIfDocumentHasProperty(XWPFDocument docx, String property, String value) {
+        CTPageMar margin = docx.getDocument().getBody().getSectPr().getPgMar();
+        switch (property) {
+            case "MARGIN TOP":
+                return String.valueOf(margin.getTop().longValue()/1440).equals(value);
+            case "MARGIN LEFT":
+                return String.valueOf(margin.getLeft().longValue()/1440).equals(value);
+            case "MARGIN BOTTOM":
+                return String.valueOf(margin.getBottom().longValue()/1440).equals(value);
+            case "MARGIN RIGHT":
+                return String.valueOf(margin.getRight().longValue()/1440).equals(value);
+            default:
+                return false;
+        }
+    }
+    public static Map<String, Object> checkPropertiesOfDocument(XWPFDocument docx, Map<String, String> properties) {
+        Map<String, Object> results = new HashMap<>();
+        CTPageMar margin = docx.getDocument().getBody().getSectPr().getPgMar();
+        
+        // Initialize results, properties which were not found in the document are left as 0
+        for (String property : properties.keySet()) {
+            results.put(property, "0/1");
+        }
+        
+        for (String property : properties.keySet()) {
+            if(checkIfDocumentHasProperty(docx, property, properties.get(property))) {
+                results.put(property, "1/1");
+            }
         }
         return results;
     }

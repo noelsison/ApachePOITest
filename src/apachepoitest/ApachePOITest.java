@@ -63,7 +63,7 @@ public class ApachePOITest {
             // Scores are determined by the number of elements within the paragraph which follows the given formatting
             Map<String, HashMap> results;
             results = DocumentPropertyChecker.checkRunPropertiesOfParagraphs(docx1.getParagraphs(), sl, properties);
-            System.out.println(results.toString());
+            System.out.println("1. " + results.toString());
             
             //2
             tl = new String[]{"Summary", "Educational Background", "Related Work Experience", "Additional Work Experience"};
@@ -74,7 +74,7 @@ public class ApachePOITest {
             properties.put("BOLD", "true");
             
             results = DocumentPropertyChecker.checkRunPropertiesOfParagraphs(docx1.getParagraphs(), sl, properties);
-            System.out.println(results.toString());
+            System.out.println("2. " + results.toString());
             
             //3
             tl = new String[]{"Holds Bachelor's Degree in Music and Education with TEFL certification", 
@@ -87,7 +87,7 @@ public class ApachePOITest {
             properties.put("LINE SPACING", "1.5");
             
             results = DocumentPropertyChecker.checkPropertiesOfParagraphs(docx1.getParagraphs(), sl, properties);
-            System.out.println(results.toString());
+            System.out.println("3. " + results.toString());
             
             //5
             tl = new String[]{"St. Peter's University",
@@ -100,17 +100,24 @@ public class ApachePOITest {
             properties.put("NUMBERING FORMAT", "bullet"); 
             
             results = DocumentPropertyChecker.checkPropertiesOfParagraphs(docx1.getParagraphs(), sl, properties);
-            System.out.println(results.toString());
+            System.out.println("5. " + results.toString());
             
             //7
-            //CTPageMar margin = docx.getDocument().getBody().getSectPr().getPgMar();
+            properties = new HashMap();
+            properties.put("MARGIN TOP", "2");
+            properties.put("MARGIN BOTTOM", "2");
+            properties.put("MARGIN LEFT", "2");
+            properties.put("MARGIN RIGHT", "2");
+            
+            results = DocumentPropertyChecker.checkPropertiesOfDocument(docx1, properties);
+            System.out.println("7. " + results.toString());
             
             //8
             properties = new HashMap();
             properties.put("ALIGN", "both");
             
             results = DocumentPropertyChecker.checkPropertiesOfAllParagraphs(docx1.getParagraphs(), properties);
-            System.out.println(results.toString());
+            System.out.println("8. " + results.toString());
             
         } catch (IOException ex) {
             Logger.getLogger(ApachePOITest.class.getName()).log(Level.SEVERE, null, ex);
