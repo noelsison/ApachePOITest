@@ -293,14 +293,14 @@ public class DocumentPropertyChecker {
         // Initialize results, properties which were not found in the document are left as 0
         for (String s : sl) {
             result.put(s, new HashMap());
-            result.get(s).put("EXISTS", false);
+            result.get(s).put("EXISTS", "0/0");
         }
         for (XWPFParagraph p : pl) {
             if (p.getParagraphText().isEmpty()) { continue; }
             if (removeStrings.isEmpty()) { removeStrings = new ArrayList(); }
             for (String s : sl) {
                 if (p.getParagraphText().contains(s)) {
-                    result.get(s).put("EXISTS", true);
+                    result.get(s).put("EXISTS", "1/1");
                     removeStrings.add(s);
                 }
             }
