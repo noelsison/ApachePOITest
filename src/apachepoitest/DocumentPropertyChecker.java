@@ -287,4 +287,27 @@ public class DocumentPropertyChecker {
         }
         return results;
     }
+    public static Map<String, HashMap> checkIfStringExistsInParagraphs(List<XWPFParagraph> pl,  ArrayList<String> sl) {
+        Map<String, HashMap> result = new HashMap<>();
+        List<String> removeStrings = new ArrayList();
+        // Initialize results, properties which were not found in the document are left as 0
+        for (String s : sl) {
+            result.put(s, new HashMap());
+            result.get(s).put("EXISTS", false);
+        }
+        for (XWPFParagraph p : pl) {
+            if (p.getParagraphText().isEmpty()) { continue; }
+            if (removeStrings.isEmpty()) { removeStrings = new ArrayList(); }
+            for (String s : sl) {
+                if (p.getParagraphText().contains(s)) {
+                    result.get(s).put("EXISTS", true);
+                    removeStrings.add(s);
+                }
+            }
+            for (String s : removeStrings) {
+                sl.remove(s);
+            }
+        }
+        return result;
+    }
 }

@@ -89,6 +89,12 @@ public class ApachePOITest {
             results = DocumentPropertyChecker.checkPropertiesOfParagraphs(docx1.getParagraphs(), sl, properties);
             System.out.println("3. " + results.toString());
             
+            //4
+            tl = new String[]{"2008-2011"};
+            sl.addAll(Arrays.asList(tl));
+            results = DocumentPropertyChecker.checkIfStringExistsInParagraphs(docx1.getParagraphs(), sl);
+            System.out.println("4. " + results.toString());
+            
             //5
             tl = new String[]{"St. Peter's University",
                               "2011 – Present",
@@ -101,6 +107,12 @@ public class ApachePOITest {
             
             results = DocumentPropertyChecker.checkPropertiesOfParagraphs(docx1.getParagraphs(), sl, properties);
             System.out.println("5. " + results.toString());
+            
+            //6
+            tl = new String[]{"Black Pen Movement \u00AE"};
+            sl.addAll(Arrays.asList(tl));
+            results = DocumentPropertyChecker.checkIfStringExistsInParagraphs(docx1.getParagraphs(), sl);
+            System.out.println("6. " + results.toString());
             
             //7
             properties = new HashMap();
